@@ -50,13 +50,13 @@
 <body>
 
     <header>
-        <h2>🥪 SandoStation</h2>
+        <h2>☕ KopiKita</h2>
         <a href="riwayat.html" class="btn-outline">Cek Pesanan 🔍</a>
     </header>
 
     <section class="hero">
-        <h1>Sando Premium di <span>Sekolahmu!</span></h1>
-        <p>Pre-order sando buah segar dengan krim lembut. Dibuat fresh, bayar pas barang sampai di tanganmu.</p>
+        <h1>Jajanan Premium di <span>Sekolahmu!</span></h1>
+        <p>Pre-order Jajanan Premium.</p>
     </section>
 
     <section id="order" class="order-section">
@@ -150,7 +150,7 @@
 
                 const alertBox = document.getElementById('time-alert');
 
-                if (dayOfWeek === 'Friday' || dayOfWeek === 'Saturday') {
+                if (dayOfWeek === 'Friday') {
                     alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
                 } else if (hour >= 21) {
                     alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
