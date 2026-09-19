@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | KopiKita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #00d2d3; --accent-hover: #01a3a4; --dark-bg: #11141a; --glass-bg: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); --text: #c8d6e5; --white: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--dark-bg); color: var(--text); min-height: 100vh; background-image: radial-gradient(circle at top right, rgba(0, 210, 211, 0.15), transparent 40%), radial-gradient(circle at bottom left, rgba(255, 71, 87, 0.15), transparent 40%); }
+        
+        /* Glass Login */
+        #login-screen { max-width: 400px; margin: 120px auto; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        #login-screen h2 { color: var(--white); margin-bottom: 25px; font-weight: 800; }
+        .input-box { width: 100%; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--white); outline: none; transition: border 0.3s; font-size: 1rem; }
+        .input-box:focus { border-color: var(--accent); }
+        .btn-admin { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.3s; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 210, 211, 0.3); }
+        .btn-admin:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* Dashboard Container */
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: none; }
+        .header-dash { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header-dash h2 { color: var(--white); font-weight: 800; font-size: 2rem; }
+        .header-dash span { color: var(--accent); font-weight: 600; padding: 5px 15px; background: rgba(0, 210, 211, 0.1); border-radius: 20px; }
+        
+        /* Glass Cards */
+        .card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 30px; border-radius: 24px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .card h3 { color: var(--white); margin-bottom: 25px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        
+        /* Inputs in Card */
+        .flex-group { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
+        .flex-group input { flex: 1; min-width: 180px; padding: 12px 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--white); outline: none; transition: 0.3s; }
+        .flex-group input:focus { border-color: var(--accent); }
+        .btn-add { background: var(--accent); color: #000; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-add:hover { background: var(--accent-hover); }
+        
+        .menu-list { list-style: none; }
+        .menu-list li { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Glass Table */
+        .search-bar { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--white); margin-bottom: 20px; outline: none; }
+        .search-bar:focus { border-color: var(--accent); }
+        .table-wrap { overflow-x: auto; border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 18px 15px; border-bottom: 1px solid var(--glass-border); font-size: 0.95rem; }
+        th { color: var(--white); font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .btn-danger { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid #ff4757; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 700; transition: 0.3s; }
+        .btn-danger:hover { background: #ff4757; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>System Login</h2>
+        <input type="password" id="admin-pass" class="input-box" placeholder="Enter Administrator Password">
+        <button id="btn-login" class="btn-admin">Access Panel</button>
+    </div>
+
+    <div id="admin-content" class="container">
+        <div class="header-dash">
+            <h2>KopiKita <span>Admin V2.0</span></h2>
+        </div>
+        
+        <div class="card">
+            <h3>📦 Kelola Menu & Stok</h3>
+            <div class="flex-group">
+                <input type="text" id="new-nama" placeholder="Nama Menu (ex: Sando Mangga)">
+                <input type="number" id="new-harga" placeholder="Harga (ex: 15000)">
+                <input type="number" id="new-stok" placeholder="Stok Awal">
+                <button id="btn-tambah" class="btn-add">+ Tambahkan</button>
+            </div>
+            <ul id="admin-items-list" class="menu-list"></ul>
+        </div>
+
+        <div class="card">
+            <h3>🧾 Data Pemesanan Masuk (PO)</h3>
+            <input type="text" id="admin-search" class="search-bar" placeholder="🔍 Cari nama pelanggan...">
+            
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Nama</th>
+                            <th>Kls</th>
+                            <th>Menu</th>
+                            <th>Qty</th>
+                            <th>Total (Rp)</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, push, remove, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyDMrg2agHatw9REIXs0Pj-894UMhMB08NI",
+            authDomain: "databaseku-4e72e.firebaseapp.com",
+            databaseURL: "https://databaseku-4e72e-default-rtdb.firebaseio.com",
+            projectId: "databaseku-4e72e"
+        });
+        const db = getDatabase(app);
+
+        // Login Logic
+        document.getElementById('btn-login').addEventListener('click', () => {
+            if(document.getElementById('admin-pass').value === "admin123") {
+                document.getElementById('login-screen').style.display = "none";
+                document.getElementById('admin-content').style.display = "block";
+                loadData();
+            } else {
+                alert("Access Denied! ❌ Password Salah.");
+            }
+        });
+
+        let currentOrders = {};
+
+        function loadData() {
+            onValue(ref(db, 'items'), (snap) => {
+                const items = snap.val() || {};
+                let html = "";
+                for (let id in items) {
+                    html += `<li>
+                        <span style="color: #fff; font-weight: 600;">${items[id].nama} <span style="color: var(--accent); margin-left: 10px;">Rp ${items[id].harga.toLocaleString('id-ID')}</span> <span style="color: #a4b0be; margin-left: 10px; font-weight: normal;">| Stok: ${items[id].stok}</span></span>
+                        <button class="btn-danger" onclick="window.hapusItem('${id}')">Hapus</button>
+                    </li>`;
+                }
+                document.getElementById('admin-items-list').innerHTML = html;
+            });
+
+            onValue(ref(db, 'orders'), (snap) => {
+                currentOrders = snap.val() || {};
+                renderTable(currentOrders);
+            });
+        }
+
+        window.renderTable = function(orders) {
+            let html = '';
+            for (let id in orders) {
+                let d = orders[id];
+                let stsColor = d.status === "Diterima" ? "#00d2d3" : "#ff4757";
+                html += `<tr>
+                    <td style="color:#a4b0be;">${d.tanggal.split(',')[0]}</td>
+                    <td style="color:var(--white); font-weight:600;">${d.nama}</td>
+                    <td>${d.kelas}</td>
+                    <td>${d.namaItem}</td>
+                    <td>${d.qty}</td>
+                    <td style="color:var(--accent);">Rp ${d.total.toLocaleString('id-ID')}</td>
+                    <td style="color:${stsColor}; font-weight:700;">${d.status}</td>
+                    <td>
+                        ${d.status === "Diterima" ? `<button class="btn-danger" onclick="window.batalkan('${id}', '${d.itemId}',${d.qty})">Batalkan PO</button>` : '<span style="color:#ff4757; font-size:0.8rem;">Dibatalkan</span>'}
+                    </td>
+                </tr>`;
+            }
+            document.getElementById('orders-body').innerHTML = html;
+        }
+
+        // Live Search
+        document.getElementById('admin-search').addEventListener('input', (e) => {
+            const word = e.target.value.toLowerCase();
+            let filtered = {};
+            for(let id in currentOrders) {
+                if(currentOrders[id].nama.toLowerCase().includes(word)) filtered[id] = currentOrders[id];
+            }
+            renderTable(filtered);
+        });
+
+        document.getElementById('btn-tambah').addEventListener('click', async () => {
+            const nama = document.getElementById('new-nama').value;
+            const harga = parseInt(document.getElementById('new-harga').value);
+            const stok = parseInt(document.getElementById('new-stok').value);
+            if(nama && harga && stok) {
+                await push(ref(db, 'items'), { nama, harga, stok });
+                alert("Sistem Diperbarui: Menu berhasil ditambah! ✅");
+            }
+        });
+
+        window.hapusItem = async function(id) {
+            if(confirm("Hapus item ini dari database? 🗑️")) await remove(ref(db, 'items/' + id));
+        }
+
+        window.batalkan = async function(orderId, itemId, qty) {
+            if(confirm("Batalkan PO ini? Stok akan otomatis dikembalikan ke sistem. ❌")) {
+                await update(ref(db, 'orders/' + orderId), { status: "Dibatalkan" });
+                const itemSnap = await get(ref(db, 'items/' + itemId));
+                if(itemSnap.exists()) {
+                    await update(ref(db, 'items/' + itemId), { stok: itemSnap.val().stok + qty });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
