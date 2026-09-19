@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SandoStation | Pre-Order Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff4757; --primary-hover: #ff6b81; --dark: #2f3542; --bg: #f1f2f6; --white: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--dark); overflow-x: hidden; }
+        
+        /* Navbar */
+        header { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        header h2 { color: var(--primary); font-weight: 800; font-size: 1.5rem; }
+        .btn-outline { border: 2px solid var(--primary); padding: 8px 18px; border-radius: 30px; color: var(--primary); text-decoration: none; font-weight: 700; transition: all 0.3s ease; }
+        .btn-outline:hover { background: var(--primary); color: var(--white); box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); }
+
+        /* Hero */
+        .hero { text-align: center; padding: 80px 20px; background: linear-gradient(135deg, #ffffff 0%, #ffeaa7 100%); position: relative; }
+        .hero h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; color: var(--dark); }
+        .hero h1 span { background: linear-gradient(90deg, var(--primary), #ffa502); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.1rem; color: #57606f; max-width: 600px; margin: 0 auto 30px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #ff6b81); color: var(--white); padding: 15px 35px; border-radius: 30px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 25px rgba(255, 71, 87, 0.4); display: inline-block; width: 100%; font-size: 1.1rem; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 71, 87, 0.5); }
+
+        /* Order Section */
+        .order-section { padding: 60px 20px; max-width: 650px; margin: -40px auto 40px; position: relative; z-index: 10; }
+        .form-card { background: var(--white); padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); }
+        .form-card h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: #57606f; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 15px; border: 2px solid #dfe4ea; border-radius: 12px; font-size: 1rem; outline: none; transition: all 0.3s; background: #f8f9fa; color: var(--dark); }
+        input:focus, select:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
+        .total-box { background: #fff2f2; padding: 20px; border-radius: 16px; text-align: center; margin: 25px 0; border: 2px dashed var(--primary); }
+        .total-box h3 { color: var(--primary); font-size: 1.8rem; margin-top: 5px; }
+        .alert { background: #ff7f50; color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3); }
+
+        /* Smooth FAQ */
+        .faq-section { padding: 40px 20px 80px; max-width: 700px; margin: 0 auto; }
+        .faq-section h2 { text-align: center; margin-bottom: 30px; }
+        .faq-item { background: var(--white); border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; transition: all 0.3s ease; }
+        .faq-question { padding: 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--dark); }
+        .faq-question::after { content: '+'; font-size: 1.5rem; color: var(--primary); transition: transform 0.3s ease; }
+        .faq-item.active .faq-question::after { transform: rotate(45deg); }
+        .faq-answer { max-height: 0; padding: 0 20px; opacity: 0; transition: all 0.4s ease; color: #57606f; line-height: 1.6; }
+        .faq-item.active .faq-answer { max-height: 200px; padding: 0 20px 20px; opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>🥪 SandoStation</h2>
+        <a href="riwayat.html" class="btn-outline">Cek Pesanan 🔍</a>
+    </header>
+
+    <section class="hero">
+        <h1>Sando Premium di <span>Sekolahmu!</span></h1>
+        <p>Pre-order sando buah segar dengan krim lembut. Dibuat fresh, bayar pas barang sampai di tanganmu.</p>
+    </section>
+
+    <section id="order" class="order-section">
+        <div class="form-card">
+            <h2>Isi Form Pre-Order 📝</h2>
+            <div id="time-alert" class="alert">⏳ Memeriksa jadwal buka PO...</div>
+            
+            <form id="po-form" style="display: none;">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="buyer-name" placeholder="Ketik namamu..." required>
+                </div>
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <input type="text" id="buyer-class" placeholder="Contoh: 10 IPA 1" required>
+                </div>
+                <div class="form-group">
+                    <label>No. WhatsApp</label>
+                    <input type="number" id="buyer-phone" placeholder="08xxxxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label>Pilih Sando</label>
+                    <select id="item-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Pesanan</label>
+                    <input type="number" id="item-qty" required min="1" value="1">
+                </div>
+                
+                <div class="total-box">
+                    <p style="font-size:0.9rem; color:#ff4757; font-weight: 600;">Total Pembayaran COD:</p>
+                    <h3 id="total-price">Rp 0</h3>
+                </div>
+                
+                <button type="submit" class="btn-primary">Kirim Pesanan Sekarang 🚀</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FAQ dengan Animasi Smooth -->
+    <section class="faq-section">
+        <h2>FAQ (Tanya Jawab) 💬</h2>
+        <div class="faq-item">
+            <div class="faq-question">Kapan batas waktu Pre-Order?</div>
+            <div class="faq-answer">Pre-order dibuka setiap hari dan maksimal pesanan masuk adalah jam <strong>21:00 WIB</strong>. Kalau lewat, pesanan tidak bisa diproses ya! ⏰</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Apakah hari libur tetap buka?</div>
+            <div class="faq-answer">Khusus hari <strong>Jumat dan Sabtu</strong> kami libur produksi (Tutup PO). Silakan pesan di hari lainnya. 🗓️</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Bagaimana cara mengecek pesanan?</div>
+            <div class="faq-answer">Setelah order, kamu akan dapat Kode Pesanan. Klik tombol "Cek Pesanan" di pojok kanan atas, lalu masukkan kode tersebut. 🔍</div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, push, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrg2agHatw9REIXs0Pj-894UMhMB08NI",
+            authDomain: "databaseku-4e72e.firebaseapp.com",
+            databaseURL: "https://databaseku-4e72e-default-rtdb.firebaseio.com",
+            projectId: "databaseku-4e72e",
+            storageBucket: "databaseku-4e72e.firebasestorage.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let currentItems = {};
+        let isPoOpen = false;
+
+        // Logika FAQ Smooth
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // Waktu & PO
+        async function checkTime() {
+            try {
+                const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Jakarta');
+                const data = await res.json();
+                const day = data.day_of_week; 
+                const hour = parseInt(data.datetime.substring(11, 13));
+
+                const alertBox = document.getElementById('time-alert');
+                if (day === 5 || day === 6) {
+                    alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
+                } else if (hour >= 21) {
+                    alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
+                } else {
+                    alertBox.style.display = 'none';
+                    document.getElementById('po-form').style.display = 'block';
+                    isPoOpen = true;
+                }
+            } catch (e) {
+                document.getElementById('time-alert').innerHTML = "⚠️ Gagal terhubung ke server waktu.";
+            }
+        }
+
+        onValue(ref(db, 'items'), (snap) => {
+            currentItems = snap.val() || {};
+            const select = document.getElementById('item-select');
+            select.innerHTML = '<option value="">-- Silakan Pilih Menu --</option>';
+            for (let id in currentItems) {
+                if (currentItems[id].stok > 0) {
+                    select.innerHTML += `<option value="${id}" data-price="${currentItems[id].harga}">${currentItems[id].nama} - Rp ${currentItems[id].harga.toLocaleString('id-ID')} (Stok: ${currentItems[id].stok})</option>`;
+                }
+            }
+        });
+
+        const selectEl = document.getElementById('item-select');
+        const qtyEl = document.getElementById('item-qty');
+        const totalEl = document.getElementById('total-price');
+
+        function updateHarga() {
+            if(selectEl.value && qtyEl.value > 0) {
+                const price = selectEl.options[selectEl.selectedIndex].dataset.price;
+                totalEl.innerText = `Rp ${(price * qtyEl.value).toLocaleString('id-ID')}`;
+            } else {
+                totalEl.innerText = "Rp 0";
+            }
+        }
+        selectEl.addEventListener('change', updateHarga);
+        qtyEl.addEventListener('input', updateHarga);
+
+        document.getElementById('po-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!isPoOpen) return alert("Sistem PO sedang dikunci!");
+
+            const itemId = selectEl.value;
+            const qty = parseInt(qtyEl.value);
+            const itemData = currentItems[itemId];
+
+            if(itemData.stok < qty) return alert("Stok tidak mencukupi!");
+
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = "Memproses... ⏳";
+            btn.disabled = true;
+
+            const dateNow = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+            const newOrderRef = push(ref(db, 'orders'));
+            
+            await set(newOrderRef, {
+                nama: document.getElementById('buyer-name').value,
+                kelas: document.getElementById('buyer-class').value,
+                telepon: document.getElementById('buyer-phone').value,
+                itemId: itemId,
+                namaItem: itemData.nama,
+                qty: qty,
+                total: itemData.harga * qty,
+                tanggal: dateNow,
+                status: "Diterima"
+            });
+
+            await update(ref(db, 'items/' + itemId), { stok: itemData.stok - qty });
+
+            alert(`🎉 BERHASIL!\n\nScreenshot KODE PESANAN ini untuk lacak status:\n\n👉 ${newOrderRef.key} 👈`);
+            e.target.reset();
+            totalEl.innerText = "Rp 0";
+            btn.innerHTML = "Kirim Pesanan Sekarang 🚀";
+            btn.disabled = false;
+        });
+
+        checkTime();
+    </script>
+</body>
+</html>
