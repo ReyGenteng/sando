@@ -62,7 +62,7 @@
     <section id="order" class="order-section">
         <div class="form-card">
             <h2>Isi Form Pre-Order 📝</h2>
-            <div id="time-alert" class="alert">⏳ Memeriksa jadwal buka PO...</div>
+            <div id="time-alert" class="alert">⏳ Memeriksa jadwal PO...</div>
             
             <form id="po-form" style="display: none;">
                 <div class="form-group">
@@ -96,7 +96,6 @@
         </div>
     </section>
 
-    <!-- FAQ dengan Animasi Smooth -->
     <section class="faq-section">
         <h2>FAQ (Tanya Jawab) 💬</h2>
         <div class="faq-item">
@@ -109,13 +108,13 @@
         </div>
         <div class="faq-item">
             <div class="faq-question">Bagaimana cara mengecek pesanan?</div>
-            <div class="faq-answer">Setelah order, kamu akan dapat Kode Pesanan. Klik tombol "Cek Pesanan" di pojok kanan atas, lalu masukkan kode tersebut. 🔍</div>
+            <div class="faq-answer">Setelah order, kamu bisa masukkan 4 digit nomor WA kamu di menu "Cek Pesanan" untuk melacak status pesananmu. 🔍</div>
         </div>
     </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, push, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        import { getDatabase, ref, push, set, update, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMrg2agHatw9REIXs0Pj-894UMhMB08NI",
@@ -138,26 +137,33 @@
             });
         });
 
-        // Waktu & PO
-        async function checkTime() {
-            try {
-                const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Jakarta');
-                const data = await res.json();
-                const day = data.day_of_week; 
-                const hour = parseInt(data.datetime.substring(11, 13));
+        // CEK WAKTU PAKAI JAM BROWSER DENGAN OFFSET WIB (PASTI BISA & TANPA RENTAN API DOWN)
+        function checkTime() {
+            const now = new Date();
+            // Konversi ke Waktu Indonesia Barat (WIB)
+            const options = { timeZone: 'Asia/Jakarta', hour12: false, weekday: 'numeric', hour: 'numeric', minute: 'numeric' };
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+            const parts = formatter.formatToParts(now);
+            
+            let day = 0;
+            let hour = 0;
 
-                const alertBox = document.getElementById('time-alert');
-                if (day === 5 || day === 6) {
-                    alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
-                } else if (hour >= 21) {
-                    alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
-                } else {
-                    alertBox.style.display = 'none';
-                    document.getElementById('po-form').style.display = 'block';
-                    isPoOpen = true;
-                }
-            } catch (e) {
-                document.getElementById('time-alert').innerHTML = "⚠️ Gagal terhubung ke server waktu.";
+            parts.forEach(p => {
+                if(p.type === 'weekday') day = parseInt(p.value); // 5=Jumat, 6=Sabtu
+                if(p.type === 'hour') hour = parseInt(p.value);
+            });
+
+            const alertBox = document.getElementById('time-alert');
+
+            // Cek jika hari Jumat (5) atau Sabtu (6)
+            if (day === 5 || day === 6) {
+                alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
+            } else if (hour >= 21) {
+                alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
+            } else {
+                alertBox.style.display = 'none';
+                document.getElementById('po-form').style.display = 'block';
+                isPoOpen = true;
             }
         }
 
@@ -213,12 +219,13 @@
                 qty: qty,
                 total: itemData.harga * qty,
                 tanggal: dateNow,
+                timestamp: serverTimestamp(),
                 status: "Diterima"
             });
 
             await update(ref(db, 'items/' + itemId), { stok: itemData.stok - qty });
 
-            alert(`🎉 BERHASIL!\n\nScreenshot KODE PESANAN ini untuk lacak status:\n\n👉 ${newOrderRef.key} 👈`);
+            alert(`🎉 PESANAN BERHASIL!\n\nGunakan 4 digit terakhir nomor WA kamu (${document.getElementById('buyer-phone').value.slice(-4)}) untuk melacak pesanan di menu Cek Pesanan.`);
             e.target.reset();
             totalEl.innerText = "Rp 0";
             btn.innerHTML = "Kirim Pesanan Sekarang 🚀";
