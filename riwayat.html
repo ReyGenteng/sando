@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Pesanan | KopiKita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff4757; --dark: #2f3542; --bg: #f1f2f6; --white: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--dark); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .track-card { background: var(--white); padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); width: 100%; max-width: 500px; text-align: center; }
+        .icon-top { font-size: 3rem; margin-bottom: 10px; }
+        .track-card h2 { margin-bottom: 10px; font-size: 1.8rem; font-weight: 800; }
+        .track-card p.subtitle { color: #57606f; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5; }
+        
+        input { width: 100%; padding: 15px 20px; border: 2px solid #dfe4ea; border-radius: 12px; font-size: 1.2rem; outline: none; margin-bottom: 20px; text-align: center; transition: all 0.3s; background: #f8f9fa; font-weight: 700; letter-spacing: 2px; }
+        input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #ff6b81); color: var(--white); padding: 15px; width: 100%; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; font-size: 1.1rem; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(255, 71, 87, 0.4); }
+        
+        /* History List Styles */
+        .result-container { margin-top: 25px; text-align: left; display: none; }
+        .history-item { background: #f8f9fa; border: 1px solid #dfe4ea; border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: all 0.3s ease; }
+        .history-header { padding: 15px 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--dark); font-size: 0.95rem; }
+        .history-header:hover { background: #f1f2f6; }
+        .history-header::after { content: '▼'; font-size: 0.8rem; color: #a4b0be; transition: transform 0.3s ease; }
+        .history-item.active .history-header::after { transform: rotate(180deg); }
+        
+        .history-details { max-height: 0; padding: 0 20px; opacity: 0; transition: all 0.4s ease; font-size: 0.9rem; color: #57606f; background: var(--white); border-top: 1px solid transparent; }
+        .history-item.active .history-details { max-height: 300px; padding: 15px 20px; opacity: 1; border-top-color: #dfe4ea; }
+        .history-details p { margin-bottom: 8px; }
+        .history-details p span { color: var(--dark); font-weight: 700; }
+        
+        .badge { padding: 5px 12px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; display: inline-block; }
+        .badge-green { background: #e3fbec; color: #2ecc71; }
+        .badge-red { background: #ffe2e2; color: #ff4757; }
+        
+        .back-link { display: inline-block; margin-top: 25px; color: var(--primary); text-decoration: none; font-weight: 700; transition: color 0.3s; }
+        .back-link:hover { color: #ff6b81; }
+    </style>
+</head>
+<body>
+
+    <div class="track-card">
+        <div class="icon-top">🧾</div>
+        <h2>Cek Pesanan</h2>
+        <p class="subtitle">Masukkan <strong>4 digit terakhir</strong> nomor WhatsApp yang kamu gunakan saat memesan.</p>
+        
+        <input type="number" id="search-code" placeholder="Contoh: 1234">
+        <button id="btn-cari" class="btn-primary">Cari Riwayat</button>
+        
+        <div id="result-container" class="result-container">
+            <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--dark);">Riwayat Transaksimu:</h3>
+            <div id="history-list"></div>
+        </div>
+        
+        <a href="index.html" class="back-link">← Kembali ke Form PO</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyDMrg2agHatw9REIXs0Pj-894UMhMB08NI",
+            authDomain: "databaseku-4e72e.firebaseapp.com",
+            databaseURL: "https://databaseku-4e72e-default-rtdb.firebaseio.com",
+            projectId: "databaseku-4e72e"
+        });
+        const db = getDatabase(app);
+
+        document.getElementById('btn-cari').addEventListener('click', async () => {
+            const inputDigit = document.getElementById('search-code').value.trim();
+            const container = document.getElementById('result-container');
+            const listDiv = document.getElementById('history-list');
+            
+            if(!inputDigit || inputDigit.length < 1) {
+                return alert("Masukkan digit nomor WA kamu ya!");
+            }
+
+            container.style.display = 'block';
+            listDiv.innerHTML = "<p align='center'>Mencari data ke database... ⏳</p>";
+
+            // Mengambil semua data orders dari Firebase
+            const snapshot = await get(ref(db, 'orders'));
+            
+            if(snapshot.exists()) {
+                const orders = snapshot.val();
+                let matches = [];
+
+                // Mencocokkan 4 digit terakhir (atau sesuai input) dari nomor WA pelanggan
+                for (let id in orders) {
+                    if (orders[id].telepon && orders[id].telepon.endsWith(inputDigit)) {
+                        matches.push({ id, ...orders[id] });
+                    }
+                }
+
+                if (matches.length > 0) {
+                    // Mengurutkan dari pesanan terbaru ke terlama
+                    matches.reverse();
+                    
+                    let html = '';
+                    matches.forEach(data => {
+                        let badgeClass = data.status === "Diterima" ? "badge-green" : "badge-red";
+                        let shortDate = data.tanggal.split(',')[0]; // Ambil tanggalnya saja
+                        
+                        html += `
+                            <div class="history-item">
+                                <div class="history-header">
+                                    ${shortDate} - ${data.namaItem}
+                                </div>
+                                <div class="history-details">
+                                    <p>Pemesan: <span>${data.nama} (Kelas ${data.kelas})</span></p>
+                                    <p>Nomor WA: <span>${data.telepon}</span></p>
+                                    <p>Pesanan: <span>${data.namaItem} (x${data.qty})</span></p>
+                                    <p>Total Bayar: <span style="color:#ff4757;">Rp ${data.total.toLocaleString('id-ID')}</span></p>
+                                    <p style="margin-top: 10px;">Status: <span class="badge ${badgeClass}">${data.status}</span></p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    listDiv.innerHTML = html;
+
+                    // Mengaktifkan fitur klik buka-tutup (Accordion)
+                    document.querySelectorAll('.history-header').forEach(header => {
+                        header.addEventListener('click', () => {
+                            const item = header.parentElement;
+                            // Tutup yang lain jika ingin hanya 1 yang terbuka (opsional, saat ini dibebaskan)
+                            item.classList.toggle('active');
+                        });
+                    });
+
+                } else {
+                    listDiv.innerHTML = "<p style='color:#ff4757; text-align:center;'>❌ Tidak ada pesanan dengan akhiran nomor tersebut.</p>";
+                }
+            } else {
+                listDiv.innerHTML = "<p style='color:#ff4757; text-align:center;'>Belum ada data pesanan di sistem.</p>";
+            }
+        });
+    </script>
+</body>
+</html>
