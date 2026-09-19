@@ -96,6 +96,7 @@
         </div>
     </section>
 
+    <!-- FAQ -->
     <section class="faq-section">
         <h2>FAQ (Tanya Jawab) 💬</h2>
         <div class="faq-item">
@@ -129,7 +130,7 @@
         let currentItems = {};
         let isPoOpen = false;
 
-        // Logika FAQ Smooth
+        // Logika FAQ Animasi
         document.querySelectorAll('.faq-question').forEach(question => {
             question.addEventListener('click', () => {
                 const item = question.parentElement;
@@ -137,36 +138,33 @@
             });
         });
 
-        // CEK WAKTU PAKAI JAM BROWSER DENGAN OFFSET WIB (PASTI BISA & TANPA RENTAN API DOWN)
-        function checkTime() {
-            const now = new Date();
-            // Konversi ke Waktu Indonesia Barat (WIB)
-            const options = { timeZone: 'Asia/Jakarta', hour12: false, weekday: 'numeric', hour: 'numeric', minute: 'numeric' };
-            const formatter = new Intl.DateTimeFormat('id-ID', options);
-            const parts = formatter.formatToParts(now);
-            
-            let day = 0;
-            let hour = 0;
+        // 🟢 FUNGSI CEK WAKTU MENGGUNAKAN TIMEAPI.IO
+        async function checkTime() {
+            try {
+                // Request ke API yang kamu kirimkan di gambar (TimeAPI.io)
+                const res = await fetch('https://timeapi.io/api/Time/current/zone?timeZone=Asia/Jakarta');
+                const data = await res.json();
+                
+                const dayOfWeek = data.dayOfWeek; // Menghasilkan teks: "Monday", "Friday", "Saturday", dll
+                const hour = data.hour; // Menghasilkan angka jam: 0 - 23
 
-            parts.forEach(p => {
-                if(p.type === 'weekday') day = parseInt(p.value); // 5=Jumat, 6=Sabtu
-                if(p.type === 'hour') hour = parseInt(p.value);
-            });
+                const alertBox = document.getElementById('time-alert');
 
-            const alertBox = document.getElementById('time-alert');
-
-            // Cek jika hari Jumat (5) atau Sabtu (6)
-            if (day === 5 || day === 6) {
-                alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
-            } else if (hour >= 21) {
-                alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
-            } else {
-                alertBox.style.display = 'none';
-                document.getElementById('po-form').style.display = 'block';
-                isPoOpen = true;
+                if (dayOfWeek === 'Friday' || dayOfWeek === 'Saturday') {
+                    alertBox.innerHTML = "⛔ Hari Jumat & Sabtu libur (PO Tutup).";
+                } else if (hour >= 21) {
+                    alertBox.innerHTML = "🌙 PO hari ini sudah ditutup (Maks 21.00 WIB).";
+                } else {
+                    alertBox.style.display = 'none';
+                    document.getElementById('po-form').style.display = 'block';
+                    isPoOpen = true;
+                }
+            } catch (e) {
+                document.getElementById('time-alert').innerHTML = "⚠️ Gagal mengambil waktu dari server API.";
             }
         }
 
+        // Ambil Data Produk dari Firebase
         onValue(ref(db, 'items'), (snap) => {
             currentItems = snap.val() || {};
             const select = document.getElementById('item-select');
@@ -193,6 +191,7 @@
         selectEl.addEventListener('change', updateHarga);
         qtyEl.addEventListener('input', updateHarga);
 
+        // Fungsi Simpan Pesanan ke Firebase
         document.getElementById('po-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!isPoOpen) return alert("Sistem PO sedang dikunci!");
@@ -232,6 +231,7 @@
             btn.disabled = false;
         });
 
+        // Panggil fungsi cek waktu saat pertama kali web dibuka
         checkTime();
     </script>
 </body>
